@@ -1,7 +1,7 @@
 {
   "schema": "mingtang-verify/1",
   "title": "明堂图 · 可复跑校核报告",
-  "generated_at": "2026-11-03T08:45:03.149Z",
+  "generated_at": "2026-11-03T09:28:49.326Z",
   "target": {
     "file": "index.html",
     "bytes": 756616,
@@ -94,6 +94,15 @@
       "reader_impact": "视觉上该处两个球叠为一个。界面把所有精确同坐标的穴位收成琥珀数字牌（此处为「2」），点击牌面可选组内穴，因此阴陵泉与曲泉仍可分别点开查看，信息可达性未受损，代价是多一步点击。该重合处也被列在左侧「全部重合处清单」里。"
     }
   ],
+  "drift": {
+    "status": "clean",
+    "note": "361 穴数据与已批准基线逐穴一致",
+    "baseline": {
+      "approved_at": "2026-11-03T09:26:18.648Z",
+      "points": 361
+    },
+    "file_changed_only": false
+  },
   "thresholds": {
     "minGap": 0.004,
     "minGapMeridian": 0.004,

@@ -1,8 +1,16 @@
 #!/usr/bin/env node
 /* 明堂图 · 可复跑校核器
  * ---------------------------------------------------------------------------
- * 用法：node verify/verify.cjs
- * 依赖：无。只用 Node 内置模块（fs / path / crypto）。不需要 npm install。
+ * 用法：
+ *   node verify/verify.cjs                     常规：40 项校核 + 基线漂移检测
+ *   node verify/verify.cjs --self-test         自检：注入 4 类篡改，验证比对真能抓到
+ *   node verify/verify.cjs --accept-baseline --reason "改了什么、为什么"
+ *                                              批准当前数据为新基线（只能用于 index.html）
+ *   node verify/verify.cjs --target <文件>      对副本 / 旧版本做检查（此模式不允许批准基线）
+ *
+ * 退出码：0 全过且无漂移 ｜ 1 有校核失败 ｜ 2 基线漂移未批准 ｜ 3 两者都有
+ *
+ * 依赖：无。只用 Node 内置模块（fs / path / crypto / child_process）。不需要 npm install。
  *
  * 它做什么：
  *   从 index.html 里抽出 DATA（361 穴的坐标与分级），重新计算一组校核，
@@ -29,6 +37,7 @@ const crypto = require('crypto');
 const ROOT = path.join(__dirname, '..');
 const TARGET = path.join(ROOT, 'index.html');
 const OUT = path.join(__dirname, 'verify_report.json');
+const BASELINE = path.join(__dirname, 'baseline.json');
 
 /* 阈值集中在处，每一项都写了依据。改阈值等于改标准，请连同依据一起改。 */
 const TH = {
@@ -448,6 +457,149 @@ function buildArchive(dir) {
   return out;
 }
 
+/* ------------------------------------------------ 二、基线漂移检测 */
+
+/*
+ *  为什么还要一份基线：校核器能证明「当前这一份数据是否自洽」，
+ *  但证明不了「它是不是上一次批准过的那一份」。所以另存一份被批准的
+ *  坐标基线（baseline.json），每次跑都逐穴比对。
+ *
+ *  三条设计纪律，都是为了让告警不退化成噪音：
+ *
+ *   1) 按「数据」比，不按「文件」比。
+ *      改一句界面文字不该触发坐标告警。数据指纹只由 361 穴的
+ *      (code, name, p, g) 算出；文件 sha 只作记录，不参与漂移判定。
+ *
+ *   2) 差异必须定位到穴。
+ *      只说「文件变了」等于没说。要列出改了哪几个穴、从哪到哪、移动多少寸。
+ *
+ *   3) 必须有出口。
+ *      有意改动用 --accept-baseline --reason "..." 更新基线并留痕，
+ *      之后自动恢复 clean。一个永远红着、且没法变绿的告警，
+ *      最后一定会被所有人忽略——那比没有告警更糟。
+ */
+
+function pointIndex(DATA) {
+  const idx = new Map();
+  for (const m of DATA) for (const p of m.pts) {
+    idx.set(`${m.code}|${p.n}`, {
+      code: m.code, n: p.n, g: p.g,
+      p: p.p.map(v => Number(v.toFixed(5))),   // 统一到求解器舍入口径
+    });
+  }
+  return idx;
+}
+
+function fingerprint(idx) {
+  const rows = [...idx.keys()].sort().map(k => {
+    const v = idx.get(k);
+    return `${k}:${v.g}:${v.p.join(',')}`;
+  });
+  return crypto.createHash('sha256').update(rows.join('\n')).digest('hex');
+}
+
+function diffBaseline(baseIdx, curIdx) {
+  const modified = [], gradeChanged = [], added = [], removed = [];
+  for (const [k, cur] of curIdx) {
+    const b = baseIdx.get(k);
+    if (!b) { added.push({ code: cur.code, n: cur.n, g: cur.g, p: cur.p }); continue; }
+    if (cur.p.some((v, i) => Math.abs(v - b.p[i]) > 1e-9)) {
+      const d = Math.hypot(cur.p[0] - b.p[0], cur.p[1] - b.p[1], cur.p[2] - b.p[2]);
+      modified.push({
+        code: cur.code, n: cur.n, g: cur.g,
+        from: b.p, to: cur.p,
+        dist: Number(d.toFixed(5)),
+        cun: Number((d / 0.0233).toFixed(2)),   // 横向 1 寸，供人读
+      });
+    }
+    if (cur.g !== b.g) gradeChanged.push({ code: cur.code, n: cur.n, from: b.g, to: cur.g });
+  }
+  for (const [k, b] of baseIdx) if (!curIdx.has(k)) removed.push({ code: b.code, n: b.n, g: b.g, p: b.p });
+  const cmp = (a, b) => a.n.localeCompare(b.n) || a.code.localeCompare(b.code);
+  modified.sort(cmp); added.sort(cmp); removed.sort(cmp); gradeChanged.sort(cmp);
+  return { modified, added, removed, grade_changed: gradeChanged };
+}
+
+function readBaseline() {
+  if (!fs.existsSync(BASELINE)) return null;
+  return JSON.parse(fs.readFileSync(BASELINE, 'utf8'));
+}
+
+function gitUser() {
+  try {
+    const { execFileSync } = require('child_process');
+    return execFileSync('git', ['config', 'user.name'], { encoding: 'utf8' }).trim() || 'unknown';
+  } catch { return 'unknown'; }
+}
+
+function writeBaseline(DATA, idx, fp, sha256, gCount, reason, prev) {
+  const diff = prev ? diffBaseline(new Map(prev.points.map(x => [`${x.code}|${x.n}`, x])), idx) : null;
+  const base = {
+    schema: 'mingtang-baseline/1',
+    approved_at: new Date().toISOString(),
+    target: { file: 'index.html', file_sha256: sha256, data_fingerprint: fp, points: idx.size },
+    grade_counts: gCount,
+    // 逐穴坐标：这是「被批准的坐标」本身，独立于 index.html 存在。
+    points: [...idx.values()],
+    history: [
+      ...(prev ? prev.history : []),
+      {
+        at: new Date().toISOString(),
+        by: gitUser(),
+        reason: reason || '(未提供理由 —— 应当补上)',
+        data_fingerprint: fp,
+        file_sha256: sha256,
+        first: !prev,
+        changes: diff ? {
+          modified: diff.modified.length,
+          added: diff.added.length,
+          removed: diff.removed.length,
+          grade_changed: diff.grade_changed.length,
+          detail: diff.modified.map(x => `${x.n}(${x.code}) 移动 ${x.cun} 寸`)
+            .concat(diff.removed.map(x => `删除 ${x.n}(${x.code})`))
+            .concat(diff.added.map(x => `新增 ${x.n}(${x.code})`))
+            .concat(diff.grade_changed.map(x => `${x.n}(${x.code}) 分级 ${x.from}→${x.to}`)),
+        } : null,
+      },
+    ],
+  };
+  fs.writeFileSync(BASELINE, JSON.stringify(base, null, 2) + '\n', 'utf8');
+  return base;
+}
+
+/* ---- 校核器的自检：注入篡改，确认上面这套比对真的能抓到 -------------- */
+
+function selfTest(DATA) {
+  const t = JSON.parse(JSON.stringify(DATA));
+  const pick = (code, name) => {
+    for (const m of t) if (m.code === code) for (const p of m.pts) if (p.n === name) return p;
+    return null;
+  };
+  // ① 坐标微小偏移（0.01，约 0.43 寸 —— 肉眼几乎看不出，但足以改变定位）
+  pick('ST', '足三里').p[1] = Number((pick('ST', '足三里').p[1] + 0.01).toFixed(5));
+  // ② 分级被改（实定位 → 示意）
+  pick('LR', '曲泉').g = 4;
+  // ③ 删掉一个穴
+  const lu = t.find(m => m.code === 'LU');
+  lu.pts = lu.pts.filter(p => p.n !== '少商');
+  // ④ 新增一个穴
+  lu.pts.push({ n: '不存在穴', l: '自检注入', p: [0.1, 0.2, 0.0], g: 4 });
+
+  const baseIdx = pointIndex(DATA);
+  const curIdx = pointIndex(t);
+  const d = diffBaseline(baseIdx, curIdx);
+
+  const cases = [
+    ['坐标偏移能检出（足三里 · 0.43 寸）', d.modified.length === 1 && d.modified[0].n === '足三里'],
+    ['分级变化能检出（曲泉 1→4）', d.grade_changed.length === 1 && d.grade_changed[0].n === '曲泉'],
+    ['删除穴位能检出（少商）', d.removed.length === 1 && d.removed[0].n === '少商'],
+    ['新增穴位能检出（不存在穴）', d.added.length === 1 && d.added[0].n === '不存在穴'],
+    ['未注入改动的穴不误报', d.modified.length + d.removed.length + d.grade_changed.length === 3],
+    ['数据指纹随改动而变', fingerprint(baseIdx) !== fingerprint(curIdx)],
+  ];
+  return { cases, diff: d };
+}
+
 /* ------------------------------------------------------------ 主流程 */
 
 function main() {
@@ -455,11 +607,103 @@ function main() {
   const ai = argv.indexOf('--rebuild-archive');
   const archiveDir = ai >= 0 ? argv[ai + 1] : null;
 
-  const buf = fs.readFileSync(TARGET);
+  const accept = argv.includes('--accept-baseline');
+  const ri = argv.indexOf('--reason');
+  const reason = ri >= 0 ? argv[ri + 1] : null;
+
+  /* --target：默认 index.html。可指向副本或旧版本文件做检查 / 对比。
+     但批准基线只允许针对 index.html —— 否则基线会指向一个不存在于仓库
+     发布路径上的文件，等于废掉这份基线。 */
+  const ti = argv.indexOf('--target');
+  const target = ti >= 0 ? path.resolve(argv[ti + 1]) : TARGET;
+  if (accept && path.resolve(target) !== path.resolve(TARGET)) {
+    console.error('✗ --accept-baseline 只能用于 index.html，不能用于 --target 指定的文件。');
+    console.error('  基线必须指向仓库对外发布的那个文件，否则形同虚设。');
+    process.exitCode = 1;
+    return;
+  }
+  if (ti >= 0 && !accept) console.log('（目标文件：' + path.relative(ROOT, target) + '）');
+
+  /* 自检：不写任何文件，只在内存里篡改一份副本，验证比对逻辑真能抓到 */
+  if (argv.includes('--self-test')) {
+    const DATA0 = extractDATA(fs.readFileSync(TARGET, 'utf8'));
+    const { cases, diff } = selfTest(DATA0);
+    console.log('');
+    console.log('基线漂移检测 · 自检（注入 4 类篡改，均为内存副本，不落盘）');
+    for (const [name, ok] of cases) console.log('  ' + (ok ? '✓' : '✗') + ' ' + name);
+    console.log('');
+    console.log('  检出明细：移动 ' + diff.modified.map(x => x.n + ' ' + x.cun + ' 寸').join('、'));
+    console.log('            分级 ' + diff.grade_changed.map(x => `${x.n} ${x.from}→${x.to}`).join('、'));
+    console.log('            删除 ' + diff.removed.map(x => x.n).join('、') +
+                '　新增 ' + diff.added.map(x => x.n).join('、'));
+    console.log('');
+    process.exitCode = cases.every(([, ok]) => ok) ? 0 : 1;
+    return;
+  }
+
+  const buf = fs.readFileSync(target);
   const sha256 = crypto.createHash('sha256').update(buf).digest('hex');
   const html = buf.toString('utf8');
   const DATA = extractDATA(html);
   const { checks, observations, bb, gCount, g1Min, g1Pair } = runReplayable(html, DATA);
+
+  /* ---- 基线漂移判定 -------------------------------------------------- */
+
+  const curIdx = pointIndex(DATA);
+  const fp = fingerprint(curIdx);
+  const prevBase = readBaseline();
+  const mapOf = arr => new Map(arr.map(x => [`${x.code}|${x.n}`, x]));
+
+  let drift;
+  if (accept) {
+    const nb = writeBaseline(DATA, curIdx, fp, sha256, gCount, reason, prevBase);
+    const h = nb.history[nb.history.length - 1];
+    drift = {
+      status: 'accepted',
+      note: '基线已更新（本次改动被批准，后续运行将恢复 clean）',
+      approved_at: nb.approved_at,
+      by: h.by, reason: h.reason,
+      changes: h.changes,
+    };
+    console.log('');
+    console.log('基线已更新：' + (prevBase ? 'diff 见下方 drift.changes' : '首版基线') +
+      '　理由：' + h.reason);
+  } else if (!prevBase) {
+    drift = {
+      status: 'no-baseline',
+      note: '缺少 baseline.json，无法判断数据是否被改动',
+      how: 'node verify/verify.cjs --accept-baseline --reason "建立基线的原因"',
+    };
+  } else if (prevBase.target.data_fingerprint !== fp) {
+    const d = diffBaseline(mapOf(prevBase.points), curIdx);
+    drift = {
+      status: 'unreviewed',
+      note: '361 穴数据与已批准基线不一致，且尚未被批准',
+      baseline: {
+        approved_at: prevBase.approved_at,
+        data_fingerprint: prevBase.target.data_fingerprint,
+        points: prevBase.points.length,
+      },
+      counts: {
+        modified: d.modified.length, added: d.added.length,
+        removed: d.removed.length, grade_changed: d.grade_changed.length,
+      },
+      modified: d.modified, added: d.added, removed: d.removed,
+      grade_changed: d.grade_changed,
+      how: '若改动是有意的：node verify/verify.cjs --accept-baseline --reason "改了什么、为什么"',
+    };
+  } else {
+    drift = {
+      status: 'clean',
+      note: '361 穴数据与已批准基线逐穴一致',
+      baseline: { approved_at: prevBase.approved_at, points: prevBase.points.length },
+      // 文件 sha 变了但数据没变 —— 说明改的是界面/文案，不该当坐标告警
+      file_changed_only: prevBase.target.file_sha256 !== sha256,
+    };
+    if (drift.file_changed_only) {
+      drift.file_note = 'index.html 的文件 sha 变了，但 361 穴数据未变（多半是界面或文案改动），不计为数据漂移。';
+    }
+  }
 
   /* 归档：给了 --rebuild-archive 就重建；否则沿用上一份报告里的归档，
      并在 sha 不匹配时提示归档可能已过期。 */
@@ -542,6 +786,7 @@ function main() {
     },
     // 处置登记的完整副本，便于读者不必翻 replayable 也能看到全貌
     dispositions: DISPOSITIONS.map(({ match, ...d }) => d),
+    drift,
     thresholds: TH,
     replayable: checks,
     observations,
@@ -587,12 +832,44 @@ function main() {
     }
   }
   if (archiveStale) L.push('  ⚠ 归档对应的 sha 与当前文件不一致，归档可能已过期（用 --rebuild-archive 重建）');
+
+  /* 基线漂移 */
+  L.push('');
+  if (drift.status === 'clean') {
+    L.push('  基线漂移 ✓ clean —— 361 穴与基线逐穴一致' +
+      (drift.file_changed_only ? '（文件 sha 已变：' + drift.file_note + '）' : ''));
+  } else if (drift.status === 'accepted') {
+    L.push('  基线漂移 ✓ accepted —— 本次改动已批准并入基线');
+    if (drift.changes && drift.changes.detail && drift.changes.detail.length) {
+      L.push('      变更：' + drift.changes.detail.join('；'));
+    }
+  } else if (drift.status === 'no-baseline') {
+    L.push('  基线漂移 ⚠ 无基线 —— ' + drift.note);
+    L.push('      ' + drift.how);
+  } else {
+    L.push('  基线漂移 ✗ unreviewed —— 数据与基线不一致，且尚未批准');
+    L.push(`      基线批准于 ${(drift.baseline.approved_at || '').slice(0, 10)}，共 ${drift.baseline.points} 穴`);
+    L.push(`      差异：移动 ${drift.counts.modified} · 分级 ${drift.counts.grade_changed}` +
+      ` · 新增 ${drift.counts.added} · 删除 ${drift.counts.removed}`);
+    for (const x of drift.modified.slice(0, 10)) {
+      L.push(`        · ${x.n}(${x.code})  ${x.cun} 寸  [${x.from.join(', ')}] → [${x.to.join(', ')}]`);
+    }
+    for (const x of drift.grade_changed.slice(0, 10)) {
+      L.push(`        · ${x.n}(${x.code})  分级 ${x.from} → ${x.to}`);
+    }
+    for (const x of drift.removed.slice(0, 10)) L.push(`        · 已删除 ${x.n}(${x.code})`);
+    for (const x of drift.added.slice(0, 10)) L.push(`        · 新增 ${x.n}(${x.code})`);
+    L.push('      ' + drift.how);
+  }
+
   L.push('');
   L.push('  → ' + path.relative(process.cwd(), OUT));
   L.push('');
   console.log(L.join('\n'));
 
-  process.exitCode = fail === 0 ? 0 : 1;
+  // 退出码可区分：1 = 校核失败，2 = 基线漂移未批准，3 = 两者都有。
+  const driftBad = drift.status === 'unreviewed' || drift.status === 'no-baseline';
+  process.exitCode = (fail ? 1 : 0) + (driftBad ? 2 : 0);
 }
 
 main();
