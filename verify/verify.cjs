@@ -48,6 +48,69 @@ const TH = {
   quantumTol: 1e-7,
 };
 
+/* ------------------------------------------------- 已知缺陷处置登记 */
+
+/*
+ *  这里登记的条目，校核结果**依然是 FAIL**。
+ *  登记的是「处置决定」，不是豁免 —— pass 字段一个都不改。
+ *
+ *  为什么要单独登记：一份 40/40 全绿的报告，读者无从判断阈值是不是被调到
+ *  刚好能过。而「有 2 项红着、每项写明根因与修法、并注明是作者决定暂不修」，
+ *  读者能自己判断这是诚实还是疏漏。区别就在这张表上。
+ *
+ *  status 语义：
+ *    known-open   已确认、已定位根因、修法已备，作者决定当前版本不修
+ *  （将来若修掉，把条目删掉即可；不要改成 known-fixed 留着当装饰。）
+ */
+const DISPOSITIONS = [
+  {
+    // 按「缺陷实体」匹配，不按断言名匹配：同一对重合穴会同时触发两条断言
+    // （跨经重合 与 两两最近距离），登记一次应当覆盖两条。
+    // 用 actual/note 里是否同时出现两个穴名来确认，避免将来别的穴过近时被误标。
+    match: c => c.cat === 'G5 重合' && !c.pass &&
+      ['actual', 'note'].some(k =>
+        String(c[k] || '').includes('阴陵泉') && String(c[k] || '').includes('曲泉')),
+    status: 'known-open',
+    decided: '2026-11-03',
+    decision: 'v1.0 保留不修（作者决定）',
+    defect: '阴陵泉（SP）与曲泉（LR）坐标完全重合：[0.0676, -0.4393, 0.065]',
+    triggers: '同一缺陷触发两条断言：G5「跨经无完全重合」与「实定位两两最近距离 ≥ 0.004」' +
+      '（后者实测 0.0000）。不是两个独立故障。',
+    root_cause:
+      '下肢求解表中曲泉的方位角误抄为阴陵泉的 150°。同段（膝横纹高度）四穴的方位角应为：' +
+      '阴陵泉 150°（胫骨内侧髁下缘）、膝关 165°、曲泉 190°（肌腱内缘）、阴谷 200°（肌腱之间）。',
+    detected_by: '本脚本的 G5 跨经重合断言（4 位小数口径，单侧计）',
+    missed_by_archive:
+      '78 项历史校核未捕获：其中一条叫「经内不重合」，只查同一条经内部；' +
+      '而阴陵泉属脾经、曲泉属肝经，跨经，恰好落在七个批次校核的夹缝里。',
+    fix_prepared: {
+      ready: true,
+      target: 'b10_leg_solve.cjs —— 曲泉所在行（SP/LR 同段第 13 寸）的方位角',
+      from: { azimuth_deg: 150, coord: [0.0676, -0.4393, 0.065] },
+      to: { azimuth_deg: 190, coord: [0.0599, -0.4433, 0.0214] },
+      sanity_gap: { to_yingu: '0.49 寸（肌腱内缘到肌腱之间，约半个肌腱宽）', to_xiguan: '1.21 寸' },
+      steps: [
+        '改 b10_leg_solve.cjs 该行方位角 150 → 190',
+        '重跑下肢求解，回写 index.html 的 DATA（曲泉坐标）',
+        'node verify/verify.cjs 应得 40/40，且本条目自动消失',
+        '重新发布：target.sha256 与版本号随之变化，需同步更新 README 与本报告的 target 段',
+      ],
+      note: '修法已算出并通过轴点反解验证（复现 base 与段终点差 5e-5），未执行。',
+    },
+    why_not_fixed: [
+      'v1.0 已于 2026-11-03 定版公开。改一个坐标会连带改文件 sha256 与版本号，' +
+      '而作品的立身之本是 229 穴的定位方法，不是这一个点。',
+      '更重要的是：这 2 项 FAIL 留在公开报告里，是这套校核体系没被松过阈值的证据。' +
+      '全绿的清单无法自证严格，红着的清单可以。',
+      '界限要说清：这是「记录诚实」，不是「缺陷可以不管」——修法就在上面，谁要修都能修。',
+    ],
+    reader_impact:
+      '视觉上该处两个球叠为一个。界面把所有精确同坐标的穴位收成琥珀数字牌（此处为「2」），' +
+      '点击牌面可选组内穴，因此阴陵泉与曲泉仍可分别点开查看，信息可达性未受损，' +
+      '代价是多一步点击。该重合处也被列在左侧「全部重合处清单」里。',
+  },
+];
+
 /* ------------------------------------------------------------------ 工具 */
 
 function extractDATA(html) {
@@ -433,8 +496,21 @@ function main() {
     flag: d < 0.5 * 0.0233 ? '过近，待人工判断' : '',
   }));
 
+  /* ---- 标注已知缺陷的处置状态（不动 pass） -------------------------- */
+
+  let knownOpen = 0;
+  for (const c of checks) {
+    if (c.pass) continue;                     // 处置登记只针对仍然失败的条目
+    const d = DISPOSITIONS.find(x => x.match(c));
+    if (!d) continue;
+    const { match, ...payload } = d;          // match 是函数，不写进 JSON
+    c.disposition = payload;
+    knownOpen++;
+  }
+
   const pass = checks.filter(c => c.pass).length;
   const fail = checks.length - pass;
+  const unexplained = fail - knownOpen;
   const archPass = archive.filter(c => c.pass).length;
 
   const report = {
@@ -455,10 +531,17 @@ function main() {
       total: 361,
     },
     summary: {
-      replayable: { total: checks.length, pass, fail },
+      replayable: { total: checks.length, pass, fail, known_open: knownOpen, unexplained },
       archive: { total: archive.length, pass: archPass, fail: archive.length - archPass },
+      // verdict 不做美化：有失败就是 FAIL，不因「已知」而改写成别的词。
       verdict: fail === 0 ? 'PASS' : 'FAIL',
+      verdict_note: fail === 0 ? ''
+        : (unexplained === 0
+            ? `${fail} 项未通过，均为已登记的已知缺陷（见 disposition 字段），无未解释失败。`
+            : `${fail} 项未通过：${knownOpen} 项为已登记的已知缺陷，${unexplained} 项为未解释失败。`),
     },
+    // 处置登记的完整副本，便于读者不必翻 replayable 也能看到全貌
+    dispositions: DISPOSITIONS.map(({ match, ...d }) => d),
     thresholds: TH,
     replayable: checks,
     observations,
@@ -494,11 +577,13 @@ function main() {
   if (archive.length) L.push('  历史归档 ' + archive.length + ' 项：通过 ' + archPass);
   if (fail) {
     L.push('');
-    L.push('  ── 未通过 ──');
+    L.push('  ── 未通过 ' + fail + ' 项（已登记已知缺陷 ' + knownOpen + ' / 未解释 ' + unexplained + '）──');
     for (const c of checks.filter(x => !x.pass)) {
-      L.push(`  ✗ [${c.id}] ${c.name}`);
+      const tag = c.disposition ? `[已知 · ${c.disposition.decision}]` : '[未解释]';
+      L.push(`  ✗ ${tag} [${c.id}] ${c.name}`);
       L.push(`      期望 ${c.expected}　实测 ${c.actual}`);
       if (c.note) L.push(`      ${c.note}`);
+      if (c.disposition) L.push(`      → 处置登记见 verify_report.json 的 dispositions 段`);
     }
   }
   if (archiveStale) L.push('  ⚠ 归档对应的 sha 与当前文件不一致，归档可能已过期（用 --rebuild-archive 重建）');
