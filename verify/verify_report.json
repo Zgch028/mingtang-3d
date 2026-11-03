@@ -1,0 +1,1423 @@
+{
+  "schema": "mingtang-verify/1",
+  "title": "明堂图 · 可复跑校核报告",
+  "generated_at": "2026-11-03T08:21:28.736Z",
+  "target": {
+    "file": "index.html",
+    "bytes": 756616,
+    "sha256": "11fde77ba327ab684cbda0b64984ca54e932df7d28a69672c72d8d4db885e3b7",
+    "points": 361
+  },
+  "declaration": {
+    "real": {
+      "grade": 1,
+      "count": 229,
+      "pct": "63.4"
+    },
+    "pending": {
+      "grade": 2,
+      "count": 0
+    },
+    "approximate": {
+      "grade": 3,
+      "count": 0
+    },
+    "schematic": {
+      "grade": 4,
+      "count": 132,
+      "pct": "36.6"
+    },
+    "total": 361
+  },
+  "summary": {
+    "replayable": {
+      "total": 40,
+      "pass": 38,
+      "fail": 2
+    },
+    "archive": {
+      "total": 78,
+      "pass": 78,
+      "fail": 0
+    },
+    "verdict": "FAIL"
+  },
+  "thresholds": {
+    "minGap": 0.004,
+    "minGapMeridian": 0.004,
+    "envX": [
+      0,
+      0.42
+    ],
+    "envY": [
+      -1.05,
+      0.95
+    ],
+    "envZ": [
+      -0.2,
+      0.2
+    ],
+    "quantum": 0.00001,
+    "quantumTol": 1e-7
+  },
+  "replayable": [
+    {
+      "id": "R001",
+      "cat": "G1 结构",
+      "name": "经脉数 = 14",
+      "pass": true,
+      "expected": 14,
+      "actual": 14,
+      "unit": "条",
+      "formula": "DATA.length",
+      "note": ""
+    },
+    {
+      "id": "R002",
+      "cat": "G1 结构",
+      "name": "穴位总数 = 361",
+      "pass": true,
+      "expected": 361,
+      "actual": 361,
+      "unit": "穴",
+      "formula": "sum(pts.length)",
+      "note": ""
+    },
+    {
+      "id": "R003",
+      "cat": "G1 结构",
+      "name": "每点字段齐备（n / l / p[3] / g）",
+      "pass": true,
+      "expected": 0,
+      "actual": 0,
+      "unit": "个异常点",
+      "formula": "逐点检查字段类型与 p 的长度",
+      "note": ""
+    },
+    {
+      "id": "R004",
+      "cat": "G1 结构",
+      "name": "坐标全为有限数（无 NaN / Infinity）",
+      "pass": true,
+      "expected": 0,
+      "actual": 0,
+      "unit": "个",
+      "formula": "Number.isFinite(v) for v in p",
+      "note": ""
+    },
+    {
+      "id": "R005",
+      "cat": "G1 结构",
+      "name": "坐标落在 1e-5 网格上（5 位小数口径）",
+      "pass": true,
+      "expected": "全部在 1e-5 整数倍",
+      "actual": 0,
+      "unit": "个值越格",
+      "formula": "|v/1e-5 − round(v/1e-5)| ≤ 1e-7",
+      "note": ""
+    },
+    {
+      "id": "R006",
+      "cat": "G1 结构",
+      "name": "穴名全局唯一",
+      "pass": true,
+      "expected": 0,
+      "actual": 0,
+      "unit": "个重名",
+      "formula": "按 n 计数",
+      "note": ""
+    },
+    {
+      "id": "R007",
+      "cat": "G1 结构",
+      "name": "定位描述非空（≥2 字）",
+      "pass": true,
+      "expected": 0,
+      "actual": 0,
+      "unit": "条",
+      "formula": "p.l.trim().length >= 2",
+      "note": "注：「神阙」的定位就是「脐中央」3 个字，阈值定在 4 字会把它误判成缺失"
+    },
+    {
+      "id": "R008",
+      "cat": "G2 分级",
+      "name": "分级取值域 ⊆ {1,2,3,4}",
+      "pass": true,
+      "expected": "只有 1..4",
+      "actual": "1/2/3/4",
+      "unit": "",
+      "formula": "p.g ∈ {1,2,3,4}",
+      "note": ""
+    },
+    {
+      "id": "R009",
+      "cat": "G2 分级",
+      "name": "实定位 g=1 = 229",
+      "pass": true,
+      "expected": 229,
+      "actual": 229,
+      "unit": "穴",
+      "formula": "count(p.g === 1)",
+      "note": "界面横幅「实定位 229」的来源"
+    },
+    {
+      "id": "R010",
+      "cat": "G2 分级",
+      "name": "待重建 g=2 = 0",
+      "pass": true,
+      "expected": 0,
+      "actual": 0,
+      "unit": "穴",
+      "formula": "count(p.g === 2)",
+      "note": ""
+    },
+    {
+      "id": "R011",
+      "cat": "G2 分级",
+      "name": "近似 g=3 = 0",
+      "pass": true,
+      "expected": 0,
+      "actual": 0,
+      "unit": "穴",
+      "formula": "count(p.g === 3)",
+      "note": ""
+    },
+    {
+      "id": "R012",
+      "cat": "G2 分级",
+      "name": "示意 g=4 = 132",
+      "pass": true,
+      "expected": 132,
+      "actual": 132,
+      "unit": "穴",
+      "formula": "count(p.g === 4)",
+      "note": ""
+    },
+    {
+      "id": "R013",
+      "cat": "G2 分级",
+      "name": "四级之和 = 361",
+      "pass": true,
+      "expected": 361,
+      "actual": 361,
+      "unit": "穴",
+      "formula": "Σ counts",
+      "note": ""
+    },
+    {
+      "id": "R014",
+      "cat": "G2 分级",
+      "name": "横幅文案「实定位 229 · 63.4%」与数据一致",
+      "pass": true,
+      "expected": "229 · 63.4%",
+      "actual": "229 · 63.4%",
+      "unit": "",
+      "formula": "在 index.html 中检索横幅字符串并比对实算百分比",
+      "note": ""
+    },
+    {
+      "id": "R015",
+      "cat": "G2 分级",
+      "name": "横幅文案「示意 132 · 36.6%」与数据一致",
+      "pass": true,
+      "expected": "132 · 36.6%",
+      "actual": "132 · 36.6%",
+      "unit": "",
+      "formula": "同上",
+      "note": ""
+    },
+    {
+      "id": "R016",
+      "cat": "G3 单侧",
+      "name": "全部轴点 x ≥ 0（镜像由渲染侧生成）",
+      "pass": true,
+      "expected": 0,
+      "actual": 0,
+      "unit": "个负值",
+      "formula": "p[0] >= -1e-9",
+      "note": ""
+    },
+    {
+      "id": "R017",
+      "cat": "G3 单侧",
+      "name": "任脉 全部在中线（x = 0）",
+      "pass": true,
+      "expected": 0,
+      "actual": 0,
+      "unit": "个偏离",
+      "formula": "|p[0]| <= 1e-9",
+      "note": ""
+    },
+    {
+      "id": "R018",
+      "cat": "G3 单侧",
+      "name": "督脉 全部在中线（x = 0）",
+      "pass": true,
+      "expected": 0,
+      "actual": 0,
+      "unit": "个偏离",
+      "formula": "|p[0]| <= 1e-9",
+      "note": ""
+    },
+    {
+      "id": "R019",
+      "cat": "G4 经内间距",
+      "name": "肺经 实定位相邻穴最小间距 ≥ 0.004",
+      "pass": true,
+      "expected": "≥ 0.004",
+      "actual": "0.0100（列缺·经渠）",
+      "unit": "模型单位",
+      "formula": "min |p[k] − p[k+1]| over 两端皆 g=1 的相邻对",
+      "note": "11 穴，实定位相邻对 8 组；跳过跨级对 2 组"
+    },
+    {
+      "id": "R020",
+      "cat": "G4 经内间距",
+      "name": "大肠经 实定位相邻穴最小间距 ≥ 0.004",
+      "pass": true,
+      "expected": "≥ 0.004",
+      "actual": "0.0193（下廉·上廉）",
+      "unit": "模型单位",
+      "formula": "min |p[k] − p[k+1]| over 两端皆 g=1 的相邻对",
+      "note": "20 穴，实定位相邻对 11 组；跳过跨级对 8 组"
+    },
+    {
+      "id": "R021",
+      "cat": "G4 经内间距",
+      "name": "胃经 实定位相邻穴最小间距 ≥ 0.004",
+      "pass": true,
+      "expected": "≥ 0.004",
+      "actual": "0.0158（承满·梁门）",
+      "unit": "模型单位",
+      "formula": "min |p[k] − p[k+1]| over 两端皆 g=1 的相邻对",
+      "note": "45 穴，实定位相邻对 27 组；跳过跨级对 17 组"
+    },
+    {
+      "id": "R022",
+      "cat": "G4 经内间距",
+      "name": "脾经 实定位相邻穴最小间距 ≥ 0.004",
+      "pass": true,
+      "expected": "≥ 0.004",
+      "actual": "0.0214（食窦·天溪）",
+      "unit": "模型单位",
+      "formula": "min |p[k] − p[k+1]| over 两端皆 g=1 的相邻对",
+      "note": "21 穴，实定位相邻对 15 组；跳过跨级对 5 组"
+    },
+    {
+      "id": "R023",
+      "cat": "G4 经内间距",
+      "name": "心经 实定位相邻穴最小间距 ≥ 0.004",
+      "pass": true,
+      "expected": "≥ 0.004",
+      "actual": "0.0096（通里·阴郄）",
+      "unit": "模型单位",
+      "formula": "min |p[k] − p[k+1]| over 两端皆 g=1 的相邻对",
+      "note": "9 穴，实定位相邻对 6 组；跳过跨级对 2 组"
+    },
+    {
+      "id": "R024",
+      "cat": "G4 经内间距",
+      "name": "小肠经 实定位相邻穴最小间距 ≥ 0.004",
+      "pass": true,
+      "expected": "≥ 0.004",
+      "actual": "0.0195（秉风·曲垣）",
+      "unit": "模型单位",
+      "formula": "min |p[k] − p[k+1]| over 两端皆 g=1 的相邻对",
+      "note": "19 穴，实定位相邻对 10 组；跳过跨级对 8 组"
+    },
+    {
+      "id": "R025",
+      "cat": "G4 经内间距",
+      "name": "膀胱经 实定位相邻穴最小间距 ≥ 0.004",
+      "pass": true,
+      "expected": "≥ 0.004",
+      "actual": "0.0193（心俞·督俞）",
+      "unit": "模型单位",
+      "formula": "min |p[k] − p[k+1]| over 两端皆 g=1 的相邻对",
+      "note": "67 穴，实定位相邻对 48 组；跳过跨级对 18 组"
+    },
+    {
+      "id": "R026",
+      "cat": "G4 经内间距",
+      "name": "肾经 实定位相邻穴最小间距 ≥ 0.004",
+      "pass": true,
+      "expected": "≥ 0.004",
+      "actual": "0.0158（腹通谷·幽门）",
+      "unit": "模型单位",
+      "formula": "min |p[k] − p[k+1]| over 两端皆 g=1 的相邻对",
+      "note": "27 穴，实定位相邻对 20 组；跳过跨级对 6 组"
+    },
+    {
+      "id": "R027",
+      "cat": "G4 经内间距",
+      "name": "心包经 实定位相邻穴最小间距 ≥ 0.004",
+      "pass": true,
+      "expected": "≥ 0.004",
+      "actual": "0.0193（间使·内关）",
+      "unit": "模型单位",
+      "formula": "min |p[k] − p[k+1]| over 两端皆 g=1 的相邻对",
+      "note": "9 穴，实定位相邻对 6 组；跳过跨级对 2 组"
+    },
+    {
+      "id": "R028",
+      "cat": "G4 经内间距",
+      "name": "三焦经 实定位相邻穴最小间距 ≥ 0.004",
+      "pass": true,
+      "expected": "≥ 0.004",
+      "actual": "0.0192（外关·支沟）",
+      "unit": "模型单位",
+      "formula": "min |p[k] − p[k+1]| over 两端皆 g=1 的相邻对",
+      "note": "23 穴，实定位相邻对 11 组；跳过跨级对 11 组"
+    },
+    {
+      "id": "R029",
+      "cat": "G4 经内间距",
+      "name": "胆经 实定位相邻穴最小间距 ≥ 0.004",
+      "pass": true,
+      "expected": "≥ 0.004",
+      "actual": "0.0113（阳交·外丘）",
+      "unit": "模型单位",
+      "formula": "min |p[k] − p[k+1]| over 两端皆 g=1 的相邻对",
+      "note": "44 穴，实定位相邻对 16 组；跳过跨级对 27 组"
+    },
+    {
+      "id": "R030",
+      "cat": "G4 经内间距",
+      "name": "肝经 实定位相邻穴最小间距 ≥ 0.004",
+      "pass": true,
+      "expected": "≥ 0.004",
+      "actual": "0.0169（膝关·曲泉）",
+      "unit": "模型单位",
+      "formula": "min |p[k] − p[k+1]| over 两端皆 g=1 的相邻对",
+      "note": "14 穴，实定位相邻对 9 组；跳过跨级对 4 组"
+    },
+    {
+      "id": "R031",
+      "cat": "G4 经内间距",
+      "name": "任脉 实定位相邻穴最小间距 ≥ 0.004",
+      "pass": true,
+      "expected": "≥ 0.004",
+      "actual": "0.0118（气海·阴交）",
+      "unit": "模型单位",
+      "formula": "min |p[k] − p[k+1]| over 两端皆 g=1 的相邻对",
+      "note": "24 穴，实定位相邻对 14 组；跳过跨级对 9 组"
+    },
+    {
+      "id": "R032",
+      "cat": "G4 经内间距",
+      "name": "督脉 实定位相邻穴最小间距 ≥ 0.004",
+      "pass": true,
+      "expected": "≥ 0.004",
+      "actual": "0.0193（脊中·中枢）",
+      "unit": "模型单位",
+      "formula": "min |p[k] − p[k+1]| over 两端皆 g=1 的相邻对",
+      "note": "28 穴，实定位相邻对 13 组；跳过跨级对 14 组"
+    },
+    {
+      "id": "R033",
+      "cat": "G5 重合",
+      "name": "实定位（g=1）经内无完全重合",
+      "pass": true,
+      "expected": 0,
+      "actual": 0,
+      "unit": "组",
+      "formula": "按 4 位小数归组，组内全 g=1 且同经",
+      "note": ""
+    },
+    {
+      "id": "R034",
+      "cat": "G5 重合",
+      "name": "实定位（g=1）跨经无完全重合",
+      "pass": false,
+      "expected": 0,
+      "actual": 1,
+      "unit": "组",
+      "formula": "按 4 位小数归组，组内全 g=1 且跨经",
+      "note": "阴陵泉(SP) / 曲泉(LR)"
+    },
+    {
+      "id": "R035",
+      "cat": "G5 重合",
+      "name": "实定位两两最近距离 ≥ 0.004",
+      "pass": false,
+      "expected": "≥ 0.004",
+      "actual": "0.0000（阴陵泉·曲泉）",
+      "unit": "模型单位",
+      "formula": "min over 229² pairs",
+      "note": ""
+    },
+    {
+      "id": "R036",
+      "cat": "G6 包络",
+      "name": "x ∈ [0, 0.42]",
+      "pass": true,
+      "expected": "[0, 0.42]",
+      "actual": "[0.000, 0.341]",
+      "unit": "",
+      "formula": "min / max of p[0]",
+      "note": ""
+    },
+    {
+      "id": "R037",
+      "cat": "G6 包络",
+      "name": "y ∈ [-1.05, 0.95]",
+      "pass": true,
+      "expected": "[-1.05, 0.95]",
+      "actual": "[-0.880, 0.835]",
+      "unit": "",
+      "formula": "min / max of p[1]",
+      "note": ""
+    },
+    {
+      "id": "R038",
+      "cat": "G6 包络",
+      "name": "z ∈ [-0.2, 0.2]",
+      "pass": true,
+      "expected": "[-0.2, 0.2]",
+      "actual": "[-0.160, 0.148]",
+      "unit": "",
+      "formula": "min / max of p[2]",
+      "note": ""
+    },
+    {
+      "id": "R039",
+      "cat": "G7 胸肋",
+      "name": "rb 结构合法（肋间 n=0.5|1–12、旁开 0–12 寸；肋端 end=11|12）",
+      "pass": true,
+      "expected": 0,
+      "actual": 0,
+      "unit": "个异常",
+      "formula": "p.rb = {n, cu} 或 {end}",
+      "note": ""
+    },
+    {
+      "id": "R040",
+      "cat": "G7 胸肋",
+      "name": "含 rb 的穴位 = 26（胸肋批）",
+      "pass": true,
+      "expected": 26,
+      "actual": 26,
+      "unit": "穴",
+      "formula": "count(p.rb != null)",
+      "note": ""
+    }
+  ],
+  "observations": [
+    {
+      "name": "示意级重合组数（4 位小数口径，单侧）",
+      "value": 23,
+      "note": "涉及 68 / 132 个示意级穴位；共用占位点是「只表大致区域」的显式结果，界面以琥珀数字标出"
+    },
+    {
+      "name": "示意级最大单组",
+      "value": 7,
+      "note": "最大一组：天鼎、扶突、人迎、水突、气舍、天窗、天牖"
+    }
+  ],
+  "archive": [
+    {
+      "id": "A001",
+      "batch": "b1u",
+      "batch_name": "批次一·上 上肢主干（6 经 44 穴）",
+      "name": "沿经纵序单调（段内不翻转）",
+      "pass": true,
+      "evidence": "无翻转",
+      "replayable": false,
+      "needs": "骨度锚点表（未随仓库发布）"
+    },
+    {
+      "id": "A002",
+      "batch": "b1u",
+      "batch_name": "批次一·上 上肢主干（6 经 44 穴）",
+      "name": "左右对称（轴点 x>0，镜像由渲染生成）",
+      "pass": true,
+      "evidence": "全部轴点 x>0",
+      "replayable": false,
+      "needs": "需渲染侧镜像（单侧前提已由 G3 覆盖）"
+    },
+    {
+      "id": "A003",
+      "batch": "b1u",
+      "batch_name": "批次一·上 上肢主干（6 经 44 穴）",
+      "name": "寸数反算（从坐标反推寸数）",
+      "pass": true,
+      "evidence": "最大误差 7.11e-15 寸",
+      "replayable": false,
+      "needs": "骨度锚点表（未随仓库发布）"
+    },
+    {
+      "id": "A004",
+      "batch": "b1u",
+      "batch_name": "批次一·上 上肢主干（6 经 44 穴）",
+      "name": "贴体表（法向偏移量）",
+      "pass": true,
+      "evidence": "最大偏差 7.00e-5",
+      "replayable": false,
+      "needs": "体模几何（未随仓库发布）"
+    },
+    {
+      "id": "A005",
+      "batch": "b1u",
+      "batch_name": "批次一·上 上肢主干（6 经 44 穴）",
+      "name": "经内不重合",
+      "pass": true,
+      "evidence": "最小间距 0.0097（灵道-通里）",
+      "replayable": false,
+      "needs": "仅需坐标——已由 replayable 的 G5 覆盖"
+    },
+    {
+      "id": "A006",
+      "batch": "b1u",
+      "batch_name": "批次一·上 上肢主干（6 经 44 穴）",
+      "name": "无落入躯干",
+      "pass": true,
+      "evidence": "落入躯干 0 点",
+      "replayable": false,
+      "needs": "需该批求解中间数据（未随仓库发布）"
+    },
+    {
+      "id": "A007",
+      "batch": "b1d",
+      "batch_name": "批次一·下 下肢主干（6 经 48 穴）",
+      "name": "骨度反算（从坐标反推寸数）",
+      "pass": true,
+      "evidence": "最大误差 5.33e-15 寸",
+      "replayable": false,
+      "needs": "骨度锚点表（未随仓库发布）"
+    },
+    {
+      "id": "A008",
+      "batch": "b1d",
+      "batch_name": "批次一·下 下肢主干（6 经 48 穴）",
+      "name": "贴表面（法向偏移量）",
+      "pass": true,
+      "evidence": "最大偏差 2.78e-17",
+      "replayable": false,
+      "needs": "体模几何（未随仓库发布）"
+    },
+    {
+      "id": "A009",
+      "batch": "b1d",
+      "batch_name": "批次一·下 下肢主干（6 经 48 穴）",
+      "name": "经内不重合",
+      "pass": true,
+      "evidence": "最小间距 0.0113（阳交/外丘）",
+      "replayable": false,
+      "needs": "仅需坐标——已由 replayable 的 G5 覆盖"
+    },
+    {
+      "id": "A010",
+      "batch": "b1d",
+      "batch_name": "批次一·下 下肢主干（6 经 48 穴）",
+      "name": "沿经单调（段内不翻转）",
+      "pass": true,
+      "evidence": "无翻转；同截面穴按方位角区分，不计错",
+      "replayable": false,
+      "needs": "骨度锚点表（未随仓库发布）"
+    },
+    {
+      "id": "A011",
+      "batch": "b1d",
+      "batch_name": "批次一·下 下肢主干（6 经 48 穴）",
+      "name": "骨盆外的腿段点无遮挡",
+      "pass": true,
+      "evidence": "髋部 4 穴部分嵌入骨盆胶囊（承扶、足五里、阴廉、环跳）；y<-0.20 的点全部在体外",
+      "replayable": false,
+      "needs": "体模几何（未随仓库发布）"
+    },
+    {
+      "id": "A012",
+      "batch": "b1d",
+      "batch_name": "批次一·下 下肢主干（6 经 48 穴）",
+      "name": "左右对称（轴点 x>0，由渲染镜像生成另一侧）",
+      "pass": true,
+      "evidence": "全部 48 穴轴点 x>0",
+      "replayable": false,
+      "needs": "需渲染侧镜像（单侧前提已由 G3 覆盖）"
+    },
+    {
+      "id": "A013",
+      "batch": "b2",
+      "batch_name": "批次二 脊柱组（53 穴）",
+      "name": "覆盖 53 穴",
+      "pass": true,
+      "evidence": "39(膀胱经背段) + 14(督脉脊柱段) = 53 穴；解出 92 个坐标（BL 双侧 39×2 + DU 单侧 14）；穴名全部命中源数据",
+      "replayable": false,
+      "needs": "源数据集对照（未随仓库发布）"
+    },
+    {
+      "id": "A014",
+      "batch": "b2",
+      "batch_name": "批次二 脊柱组（53 穴）",
+      "name": "命门平脐",
+      "pass": true,
+      "evidence": "命门 y=0.1990，脐中 y=0.200",
+      "replayable": false,
+      "needs": "骨度锚点表（未随仓库发布）"
+    },
+    {
+      "id": "A015",
+      "batch": "b2",
+      "batch_name": "批次二 脊柱组（53 穴）",
+      "name": "大椎在肩下",
+      "pass": true,
+      "evidence": "大椎 y=0.4900，肩关节中心 y=0.52",
+      "replayable": false,
+      "needs": "需该批求解中间数据（未随仓库发布）"
+    },
+    {
+      "id": "A016",
+      "batch": "b2",
+      "batch_name": "批次二 脊柱组（53 穴）",
+      "name": "椎节自下而上递减",
+      "pass": true,
+      "evidence": "C7 0.490 → T12 0.249 → L5 0.124 → 尾 -0.032",
+      "replayable": false,
+      "needs": "骨度锚点表（未随仓库发布）"
+    },
+    {
+      "id": "A017",
+      "batch": "b2",
+      "batch_name": "批次二 脊柱组（53 穴）",
+      "name": "旁开寸反算",
+      "pass": true,
+      "evidence": "最大误差 0.00e+0 寸",
+      "replayable": false,
+      "needs": "骨度锚点表（未随仓库发布）"
+    },
+    {
+      "id": "A018",
+      "batch": "b2",
+      "batch_name": "批次二 脊柱组（53 穴）",
+      "name": "贴体表",
+      "pass": true,
+      "evidence": "最大偏差 2.78e-17",
+      "replayable": false,
+      "needs": "体模几何（未随仓库发布）"
+    },
+    {
+      "id": "A019",
+      "batch": "b2",
+      "batch_name": "批次二 脊柱组（53 穴）",
+      "name": "沿经单调",
+      "pass": true,
+      "evidence": "督脉由下而上递增；膀胱经背侧由上而下递减；八髎段按「回头的」独立校验",
+      "replayable": false,
+      "needs": "骨度锚点表（未随仓库发布）"
+    },
+    {
+      "id": "A020",
+      "batch": "b2",
+      "batch_name": "批次二 脊柱组（53 穴）",
+      "name": "无重合",
+      "pass": true,
+      "evidence": "最小间距 0.0119（小肠俞/上髎），≈ 0.51 寸",
+      "replayable": false,
+      "needs": "仅需坐标——已由 replayable 的 G5 覆盖"
+    },
+    {
+      "id": "A021",
+      "batch": "b2",
+      "batch_name": "批次二 脊柱组（53 穴）",
+      "name": "左右对称",
+      "pass": true,
+      "evidence": "最大偏差 0.00e+0",
+      "replayable": false,
+      "needs": "需渲染侧镜像（单侧前提已由 G3 覆盖）"
+    },
+    {
+      "id": "A022",
+      "batch": "b2",
+      "batch_name": "批次二 脊柱组（53 穴）",
+      "name": "全在背面",
+      "pass": true,
+      "evidence": "z 全部 ≤ -0.123（负值＝背侧）",
+      "replayable": false,
+      "needs": "需该批求解中间数据（未随仓库发布）"
+    },
+    {
+      "id": "A023",
+      "batch": "b3",
+      "batch_name": "批次三 胸肋（26 穴）",
+      "name": "覆盖 26 穴",
+      "pass": true,
+      "evidence": "解出 52 个坐标（26 穴 × 双侧 + 肋端）",
+      "replayable": false,
+      "needs": "源数据集对照（未随仓库发布）"
+    },
+    {
+      "id": "A024",
+      "batch": "b3",
+      "batch_name": "批次三 胸肋（26 穴）",
+      "name": "全部在体表之内",
+      "pass": true,
+      "evidence": "最大 r=0.146，同高体表半径 0.014 余量",
+      "replayable": false,
+      "needs": "体模几何（未随仓库发布）"
+    },
+    {
+      "id": "A025",
+      "batch": "b3",
+      "batch_name": "批次三 胸肋（26 穴）",
+      "name": "肋间自上而下递减",
+      "pass": true,
+      "evidence": "胃/肾/脾三经 16 穴逐肋下降",
+      "replayable": false,
+      "needs": "骨度锚点表（未随仓库发布）"
+    },
+    {
+      "id": "A026",
+      "batch": "b3",
+      "batch_name": "批次三 胸肋（26 穴）",
+      "name": "旁开弧长反算",
+      "pass": true,
+      "evidence": "全部 ≤0.02 寸",
+      "replayable": false,
+      "needs": "骨度锚点表（未随仓库发布）"
+    },
+    {
+      "id": "A027",
+      "batch": "b3",
+      "batch_name": "批次三 胸肋（26 穴）",
+      "name": "落在对应肋间隙内",
+      "pass": true,
+      "evidence": "全部在两肋之间",
+      "replayable": false,
+      "needs": "骨度锚点表（未随仓库发布）"
+    },
+    {
+      "id": "A028",
+      "batch": "b3",
+      "batch_name": "批次三 胸肋（26 穴）",
+      "name": "左右对称",
+      "pass": true,
+      "evidence": "26 穴全部镜像",
+      "replayable": false,
+      "needs": "需渲染侧镜像（单侧前提已由 G3 覆盖）"
+    },
+    {
+      "id": "A029",
+      "batch": "b3",
+      "batch_name": "批次三 胸肋（26 穴）",
+      "name": "无重合",
+      "pass": true,
+      "evidence": "最小间距 0.0201（0.86 寸，神封·步廊）",
+      "replayable": false,
+      "needs": "仅需坐标——已由 replayable 的 G5 覆盖"
+    },
+    {
+      "id": "A030",
+      "batch": "b3",
+      "batch_name": "批次三 胸肋（26 穴）",
+      "name": "不穿胸骨 / 不穿椎体",
+      "pass": true,
+      "evidence": "最小 |x| = 0.0457，胸骨半宽 0.024",
+      "replayable": false,
+      "needs": "体模几何（未随仓库发布）"
+    },
+    {
+      "id": "A031",
+      "batch": "b3",
+      "batch_name": "批次三 胸肋（26 穴）",
+      "name": "胸壁穴全在前侧半",
+      "pass": true,
+      "evidence": "最靠后的 -0.012（京门）",
+      "replayable": false,
+      "needs": "需该批求解中间数据（未随仓库发布）"
+    },
+    {
+      "id": "A032",
+      "batch": "b4",
+      "batch_name": "批次四 躯干旁开（43 穴）",
+      "name": "覆盖 43 穴",
+      "pass": true,
+      "evidence": "解出 71 个坐标（中线 15 + 旁开 28×2）；源数据缺失 0",
+      "replayable": false,
+      "needs": "源数据集对照（未随仓库发布）"
+    },
+    {
+      "id": "A033",
+      "batch": "b4",
+      "batch_name": "批次四 躯干旁开（43 穴）",
+      "name": "脐中锚点",
+      "pass": true,
+      "evidence": "神阙 y=0.2，与命门 0.199 差 0.0010",
+      "replayable": false,
+      "needs": "需该批求解中间数据（未随仓库发布）"
+    },
+    {
+      "id": "A034",
+      "batch": "b4",
+      "batch_name": "批次四 躯干旁开（43 穴）",
+      "name": "分段寸长标定",
+      "pass": true,
+      "evidence": "脐上 1 寸 = 0.01580（歧骨 0.3264）；脐下 1 寸 = 0.02000（横骨上廉 0.1）；比 0.79",
+      "replayable": false,
+      "needs": "骨度锚点表（未随仓库发布）"
+    },
+    {
+      "id": "A035",
+      "batch": "b4",
+      "batch_name": "批次四 躯干旁开（43 穴）",
+      "name": "任脉在中线",
+      "pass": true,
+      "evidence": "15 个中线坐标，最大 |x| = 0.0e+0",
+      "replayable": false,
+      "needs": "需该批求解中间数据（未随仓库发布）"
+    },
+    {
+      "id": "A036",
+      "batch": "b4",
+      "batch_name": "批次四 躯干旁开（43 穴）",
+      "name": "旁开弧长反算",
+      "pass": true,
+      "evidence": "最大误差 2.36e-4 寸（天枢）",
+      "replayable": false,
+      "needs": "骨度锚点表（未随仓库发布）"
+    },
+    {
+      "id": "A037",
+      "batch": "b4",
+      "batch_name": "批次四 躯干旁开（43 穴）",
+      "name": "三经不交叉",
+      "pass": true,
+      "evidence": "脐 / 腹哀 / 腹结三个高度上 |x| 均为 肾 0.5 < 胃 2 < 脾 4",
+      "replayable": false,
+      "needs": "需该批求解中间数据（未随仓库发布）"
+    },
+    {
+      "id": "A038",
+      "batch": "b4",
+      "batch_name": "批次四 躯干旁开（43 穴）",
+      "name": "不浮出体表",
+      "pass": true,
+      "evidence": "最大超出 6.3e-6（腹结，5 位小数舍入级）",
+      "replayable": false,
+      "needs": "体模几何（未随仓库发布）"
+    },
+    {
+      "id": "A039",
+      "batch": "b4",
+      "batch_name": "批次四 躯干旁开（43 穴）",
+      "name": "沿经纵向单调",
+      "pass": true,
+      "evidence": "任 / 胃 / 肾 / 脾四经自上而下 y 递减",
+      "replayable": false,
+      "needs": "骨度锚点表（未随仓库发布）"
+    },
+    {
+      "id": "A040",
+      "batch": "b4",
+      "batch_name": "批次四 躯干旁开（43 穴）",
+      "name": "左右对称",
+      "pass": true,
+      "evidence": "28 对全部镜像，偏差 0",
+      "replayable": false,
+      "needs": "需渲染侧镜像（单侧前提已由 G3 覆盖）"
+    },
+    {
+      "id": "A041",
+      "batch": "b4",
+      "batch_name": "批次四 躯干旁开（43 穴）",
+      "name": "无重合",
+      "pass": true,
+      "evidence": "最小间距 0.0117（≈0.50 寸，中极·大赫）—— 肾经旁开 0.5 寸与任脉的真实间距，非重合",
+      "replayable": false,
+      "needs": "仅需坐标——已由 replayable 的 G5 覆盖"
+    },
+    {
+      "id": "A042",
+      "batch": "b4",
+      "batch_name": "批次四 躯干旁开（43 穴）",
+      "name": "与胸肋批不冲突",
+      "pass": true,
+      "evidence": "跨批最小间距 0.0492（≈2.11 寸，不容·日月）",
+      "replayable": false,
+      "needs": "仅需坐标——已由 replayable 的 G5 覆盖"
+    },
+    {
+      "id": "A043",
+      "batch": "b4",
+      "batch_name": "批次四 躯干旁开（43 穴）",
+      "name": "下腹体表无假腰",
+      "pass": true,
+      "evidence": "y∈[0.08,0.26] 半径单调不减（耻骨 0.0753 → 脐 0.1483）",
+      "replayable": false,
+      "needs": "体模几何（未随仓库发布）"
+    },
+    {
+      "id": "A044",
+      "batch": "b4",
+      "batch_name": "批次四 躯干旁开（43 穴）",
+      "name": "胸腹过渡无台阶",
+      "pass": true,
+      "evidence": "前正中线 z 在过渡区最大跳变 0.0032/0.005（y≈0.245）",
+      "replayable": false,
+      "needs": "需该批求解中间数据（未随仓库发布）"
+    },
+    {
+      "id": "A045",
+      "batch": "b5",
+      "batch_name": "批次五 肩带（12 穴）",
+      "name": "覆盖 12 穴",
+      "pass": true,
+      "evidence": "12 穴 × 双侧 = 24 个坐标",
+      "replayable": false,
+      "needs": "源数据集对照（未随仓库发布）"
+    },
+    {
+      "id": "A046",
+      "batch": "b5",
+      "batch_name": "批次五 肩带（12 穴）",
+      "name": "肩胛骨三标志平椎节",
+      "pass": true,
+      "evidence": "上角平 T2（0.4426）、下角平 T7（0.3458）、冈内端平 T3（0.4233），残差 0",
+      "replayable": false,
+      "needs": "骨度锚点表（未随仓库发布）"
+    },
+    {
+      "id": "A047",
+      "batch": "b5",
+      "batch_name": "批次五 肩带（12 穴）",
+      "name": "内侧缘 = 旁开 3 寸",
+      "pass": true,
+      "evidence": "上角 x=0.07 vs 3 寸=0.0700，差 0.0004 寸（与附分/膏肓同一条第二侧线）",
+      "replayable": false,
+      "needs": "骨度锚点表（未随仓库发布）"
+    },
+    {
+      "id": "A048",
+      "batch": "b5",
+      "batch_name": "批次五 肩带（12 穴）",
+      "name": "骨板不穿出体表",
+      "pass": true,
+      "evidence": "全部 44 个网格顶点埋在体表下 ≥0.008，最大超出 3.7e-6（四舍五入残差）",
+      "replayable": false,
+      "needs": "体模几何（未随仓库发布）"
+    },
+    {
+      "id": "A049",
+      "batch": "b5",
+      "batch_name": "批次五 肩带（12 穴）",
+      "name": "肩胛骨 5 穴在板内",
+      "pass": true,
+      "evidence": "曲垣/秉风/天宗/臑俞/肩贞 共 5 穴投影落在三角板内（容差 0.0015）",
+      "replayable": false,
+      "needs": "需该批求解中间数据（未随仓库发布）"
+    },
+    {
+      "id": "A050",
+      "batch": "b5",
+      "batch_name": "批次五 肩带（12 穴）",
+      "name": "天髎在上角骨际",
+      "pass": true,
+      "evidence": "上角 [0.0700, 0.4426] 上方 0.35 寸（骨际凹陷本就在板外）",
+      "replayable": false,
+      "needs": "需该批求解中间数据（未随仓库发布）"
+    },
+    {
+      "id": "A051",
+      "batch": "b5",
+      "batch_name": "批次五 肩带（12 穴）",
+      "name": "贴在体表（同 v7 背俞口径）",
+      "pass": true,
+      "evidence": "最大偏差 2.8e-17，无外推",
+      "replayable": false,
+      "needs": "体模几何（未随仓库发布）"
+    },
+    {
+      "id": "A052",
+      "batch": "b5",
+      "batch_name": "批次五 肩带（12 穴）",
+      "name": "椎节穴反算旁开",
+      "pass": true,
+      "evidence": "肩中俞 2 寸、肩外俞 3 寸，反算误差 0.0e+0 寸",
+      "replayable": false,
+      "needs": "骨度锚点表（未随仓库发布）"
+    },
+    {
+      "id": "A053",
+      "batch": "b5",
+      "batch_name": "批次五 肩带（12 穴）",
+      "name": "肩井 = 大椎↔肩峰中点",
+      "pass": true,
+      "evidence": "大椎 [0, 0.4900, -0.1249] 与肩峰 [0.235, 0.525, 0.010] 连线的中点，残差 0.0e+0",
+      "replayable": false,
+      "needs": "需该批求解中间数据（未随仓库发布）"
+    },
+    {
+      "id": "A054",
+      "batch": "b5",
+      "batch_name": "批次五 肩带（12 穴）",
+      "name": "肩髎 = 肩髃后 1 寸",
+      "pass": true,
+      "evidence": "实测间距 0.0236（= 1.012 寸）",
+      "replayable": false,
+      "needs": "骨度锚点表（未随仓库发布）"
+    },
+    {
+      "id": "A055",
+      "batch": "b5",
+      "batch_name": "批次五 肩带（12 穴）",
+      "name": "肩峰区穴不悬空",
+      "pass": true,
+      "evidence": "巨骨/肩髃/肩髎 均在臂胶囊肩端球内，最大离轴 0.0210 < r=0.045（巨骨）",
+      "replayable": false,
+      "needs": "需该批求解中间数据（未随仓库发布）"
+    },
+    {
+      "id": "A056",
+      "batch": "b5",
+      "batch_name": "批次五 肩带（12 穴）",
+      "name": "曲垣 ≈ 臑俞—T2 连线中点",
+      "pass": true,
+      "evidence": "平面差 0.40 寸（深度方向因体模圆截面不成立，只校平面投影）",
+      "replayable": false,
+      "needs": "需该批求解中间数据（未随仓库发布）"
+    },
+    {
+      "id": "A057",
+      "batch": "b5",
+      "batch_name": "批次五 肩带（12 穴）",
+      "name": "冈上窝/冈下窝分区正确",
+      "pass": true,
+      "evidence": "天宗 y=0.4067 < 冈 0.4356（冈下）；秉风 y=0.4390 > 冈 0.4318（冈上）",
+      "replayable": false,
+      "needs": "需该批求解中间数据（未随仓库发布）"
+    },
+    {
+      "id": "A058",
+      "batch": "b5",
+      "batch_name": "批次五 肩带（12 穴）",
+      "name": "无重合",
+      "pass": true,
+      "evidence": "最小间距 0.0135（≈0.58 寸，肩外俞·天髎）",
+      "replayable": false,
+      "needs": "仅需坐标——已由 replayable 的 G5 覆盖"
+    },
+    {
+      "id": "A059",
+      "batch": "b5",
+      "batch_name": "批次五 肩带（12 穴）",
+      "name": "与既有实定位不冲突",
+      "pass": true,
+      "evidence": "跨批最小间距 0.0086（≈0.37 寸，天髎·附分）—— 肩胛骨内侧缘一带的肩带穴与膀胱经第二侧线本就同处一条竖线，这是解剖事实而非坐标错误",
+      "replayable": false,
+      "needs": "仅需坐标——已由 replayable 的 G5 覆盖"
+    },
+    {
+      "id": "A060",
+      "batch": "b6",
+      "batch_name": "批次六 骨盆（3 穴）",
+      "name": "三穴齐全",
+      "pass": true,
+      "evidence": "五枢 / 维道 / 急脉 共 3 穴（单侧 3 坐标，双侧 6）",
+      "replayable": false,
+      "needs": "需该批求解中间数据（未随仓库发布）"
+    },
+    {
+      "id": "A061",
+      "batch": "b6",
+      "batch_name": "批次六 骨盆（3 穴）",
+      "name": "五枢横平 ASIS",
+      "pass": true,
+      "evidence": "五枢 y=0.1400 = ASIS y=0.1400，同时 = 脐下 3 寸（0.200 − 3×0.020）",
+      "replayable": false,
+      "needs": "需该批求解中间数据（未随仓库发布）"
+    },
+    {
+      "id": "A062",
+      "batch": "b6",
+      "batch_name": "批次六 骨盆（3 穴）",
+      "name": "五枢在 ASIS 前 0.5 寸",
+      "pass": true,
+      "evidence": "沿体表弧长反算 0.500 寸（ASIS θ=90° → 五枢 θ=83.7°，向前）",
+      "replayable": false,
+      "needs": "骨度锚点表（未随仓库发布）"
+    },
+    {
+      "id": "A063",
+      "batch": "b6",
+      "batch_name": "批次六 骨盆（3 穴）",
+      "name": "维道在五枢前下",
+      "pass": true,
+      "evidence": "向前 0.35 寸（横向尺 0.02333）+ 向下 0.35 寸（纵向尺 0.0200）—— 古法「前下 0.5 寸」在此按各方向分标，横纵寸长本就不等，不能勾股成一个数",
+      "replayable": false,
+      "needs": "需该批求解中间数据（未随仓库发布）"
+    },
+    {
+      "id": "A064",
+      "batch": "b6",
+      "batch_name": "批次六 骨盆（3 穴）",
+      "name": "急脉旁开 2.5 寸",
+      "pass": true,
+      "evidence": "沿体表弧长反算 2.500 寸（θ=44.4°）；若按水平投影只有 2.26 寸",
+      "replayable": false,
+      "needs": "骨度锚点表（未随仓库发布）"
+    },
+    {
+      "id": "A065",
+      "batch": "b6",
+      "batch_name": "批次六 骨盆（3 穴）",
+      "name": "急脉横平耻骨联合上缘",
+      "pass": true,
+      "evidence": "急脉 y=0.0960 vs 耻骨联合上缘 0.1000，低 0.17 寸（腹股沟韧带下缘）",
+      "replayable": false,
+      "needs": "需该批求解中间数据（未随仓库发布）"
+    },
+    {
+      "id": "A066",
+      "batch": "b6",
+      "batch_name": "批次六 骨盆（3 穴）",
+      "name": "贴体表（不浮不陷）",
+      "pass": true,
+      "evidence": "三穴严格落在体表包络上（超出 0、内陷 0）",
+      "replayable": false,
+      "needs": "体模几何（未随仓库发布）"
+    },
+    {
+      "id": "A067",
+      "batch": "b6",
+      "batch_name": "批次六 骨盆（3 穴）",
+      "name": "骨标埋在体表下",
+      "pass": true,
+      "evidence": "髂嵴 13 点、耻骨上支 21 点，最大超出 1.4e-17",
+      "replayable": false,
+      "needs": "体模几何（未随仓库发布）"
+    },
+    {
+      "id": "A068",
+      "batch": "b6",
+      "batch_name": "批次六 骨盆（3 穴）",
+      "name": "ASIS 骨突凸出体表（有意）",
+      "pass": true,
+      "evidence": "球心埋入 0.004、半径 0.009 → 凸出体表 0.005（≈0.21 寸）—— 这是「骨性突起可触及」的显式表达，不算浮出",
+      "replayable": false,
+      "needs": "体模几何（未随仓库发布）"
+    },
+    {
+      "id": "A069",
+      "batch": "b6",
+      "batch_name": "批次六 骨盆（3 穴）",
+      "name": "无重合",
+      "pass": true,
+      "evidence": "最小间距 0.0135（≈0.58 寸，五枢·维道）—— 五枢与维道「前下 0.5 寸」的解剖事实",
+      "replayable": false,
+      "needs": "仅需坐标——已由 replayable 的 G5 覆盖"
+    },
+    {
+      "id": "A070",
+      "batch": "b6",
+      "batch_name": "批次六 骨盆（3 穴）",
+      "name": "沿胆经纵向不翻转",
+      "pass": true,
+      "evidence": "带脉 0.210 → 五枢 0.140 → 维道 0.133 → 居髎 -0.057（y 单调递减）",
+      "replayable": false,
+      "needs": "需该批求解中间数据（未随仓库发布）"
+    },
+    {
+      "id": "A071",
+      "batch": "b6",
+      "batch_name": "批次六 骨盆（3 穴）",
+      "name": "与既有实定位不冲突",
+      "pass": true,
+      "evidence": "跨批最小间距 0.0123（≈0.53 寸，急脉·气冲）",
+      "replayable": false,
+      "needs": "仅需坐标——已由 replayable 的 G5 覆盖"
+    },
+    {
+      "id": "A072",
+      "batch": "b6",
+      "batch_name": "批次六 骨盆（3 穴）",
+      "name": "左右对称",
+      "pass": true,
+      "evidence": "x 取反后径向距离不变（构造保证）",
+      "replayable": false,
+      "needs": "需渲染侧镜像（单侧前提已由 G3 覆盖）"
+    },
+    {
+      "id": "A073",
+      "batch": "b6",
+      "batch_name": "批次六 骨盆（3 穴）",
+      "name": "ASIS 横向尺寸对账",
+      "pass": true,
+      "evidence": "体模 ASIS 半距 4.54 寸（水平投影）= 10.6 cm，真人 ≈5.1 寸 / 12 cm —— 体模骨盆段窄 0.56 寸，故 ASIS 的**横向绝对值不可信**，只作相对参照",
+      "replayable": false,
+      "needs": "骨度锚点表（未随仓库发布）"
+    },
+    {
+      "id": "A074",
+      "batch": "b7",
+      "batch_name": "居髎复核",
+      "name": "贴体表",
+      "pass": true,
+      "evidence": "0.0000",
+      "replayable": false,
+      "needs": "体模几何（未随仓库发布）"
+    },
+    {
+      "id": "A075",
+      "batch": "b7",
+      "batch_name": "居髎复核",
+      "name": "在髋外侧（|θ-90°|<30°）",
+      "pass": true,
+      "evidence": "90.0°",
+      "replayable": false,
+      "needs": "需该批求解中间数据（未随仓库发布）"
+    },
+    {
+      "id": "A076",
+      "batch": "b7",
+      "batch_name": "居髎复核",
+      "name": "高于环跳",
+      "pass": true,
+      "evidence": "0.1053",
+      "replayable": false,
+      "needs": "需该批求解中间数据（未随仓库发布）"
+    },
+    {
+      "id": "A077",
+      "batch": "b7",
+      "batch_name": "居髎复核",
+      "name": "低于维道",
+      "pass": true,
+      "evidence": "0.0930",
+      "replayable": false,
+      "needs": "需该批求解中间数据（未随仓库发布）"
+    },
+    {
+      "id": "A078",
+      "batch": "b7",
+      "batch_name": "居髎复核",
+      "name": "与环跳不重合(>1寸)",
+      "pass": true,
+      "evidence": "5.35 寸",
+      "replayable": false,
+      "needs": "骨度锚点表（未随仓库发布）"
+    }
+  ],
+  "archive_meta": {
+    "based_on_sha256": "11fde77ba327ab684cbda0b64984ca54e932df7d28a69672c72d8d4db885e3b7",
+    "stale": false,
+    "batches": [
+      {
+        "id": "b1u",
+        "name": "批次一·上 上肢主干（6 经 44 穴）",
+        "count": 6
+      },
+      {
+        "id": "b1d",
+        "name": "批次一·下 下肢主干（6 经 48 穴）",
+        "count": 6
+      },
+      {
+        "id": "b2",
+        "name": "批次二 脊柱组（53 穴）",
+        "count": 10
+      },
+      {
+        "id": "b3",
+        "name": "批次三 胸肋（26 穴）",
+        "count": 9
+      },
+      {
+        "id": "b4",
+        "name": "批次四 躯干旁开（43 穴）",
+        "count": 13
+      },
+      {
+        "id": "b5",
+        "name": "批次五 肩带（12 穴）",
+        "count": 15
+      },
+      {
+        "id": "b6",
+        "name": "批次六 骨盆（3 穴）",
+        "count": 14
+      },
+      {
+        "id": "b7",
+        "name": "居髎复核",
+        "count": 5
+      }
+    ]
+  },
+  "coverage": {
+    "note": "replayable 是本次从 index.html 现场重算的校核；archive 是七个批次求解当时的 78 项记录。两者不是子集关系：archive 的多数条目需要未发布的中间数据才能复算，replayable 则是任何人都能跑的部分。",
+    "replayable_scope": "数据自洽：点数、分级、单侧前提、间距、重合、包络、胸肋字段、界面文案一致性",
+    "not_replayable": [
+      {
+        "kind": "寸数反算 / 旁开弧长反算",
+        "reason": "需要骨度锚点表（各段起止点与寸长），未随仓库发布"
+      },
+      {
+        "kind": "贴体表 / 骨标埋入 / 不穿出",
+        "reason": "需要体模几何（胶囊与球的参数），未随仓库发布"
+      }
+    ]
+  },
+  "nearest_g1": [
+    {
+      "pair": "阴陵泉(SP)·曲泉(LR)",
+      "dist": 0,
+      "cun": 0,
+      "flag": "过近，待人工判断"
+    },
+    {
+      "pair": "承扶(BL)·环跳(GB)",
+      "dist": 0.00571,
+      "cun": 0.25,
+      "flag": "过近，待人工判断"
+    },
+    {
+      "pair": "附分(BL)·天髎(TE)",
+      "dist": 0.00858,
+      "cun": 0.37,
+      "flag": "过近，待人工判断"
+    },
+    {
+      "pair": "通里(HT)·阴郄(HT)",
+      "dist": 0.00962,
+      "cun": 0.41,
+      "flag": "过近，待人工判断"
+    },
+    {
+      "pair": "灵道(HT)·通里(HT)",
+      "dist": 0.0097,
+      "cun": 0.42,
+      "flag": "过近，待人工判断"
+    },
+    {
+      "pair": "列缺(LU)·经渠(LU)",
+      "dist": 0.01001,
+      "cun": 0.43,
+      "flag": "过近，待人工判断"
+    },
+    {
+      "pair": "阴郄(HT)·神门(HT)",
+      "dist": 0.01027,
+      "cun": 0.44,
+      "flag": "过近，待人工判断"
+    },
+    {
+      "pair": "曲垣(SI)·魄户(BL)",
+      "dist": 0.01027,
+      "cun": 0.44,
+      "flag": "过近，待人工判断"
+    }
+  ],
+  "bounds": {
+    "x": [
+      0,
+      0.3409
+    ],
+    "y": [
+      -0.88,
+      0.835
+    ],
+    "z": [
+      -0.16,
+      0.14832
+    ]
+  }
+}
